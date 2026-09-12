@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity {
 
     private PreviewView previewView;
-    private TextView pHValueText, statusText;
+    private TextView pHValueText, statusText, productNameText, changeProductText;
     private Button captureButton, calibrateButton;
 
     private ImageCapture imageCapture;
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
 
     private boolean isCalibrating = false;
+    private FoodItem selectedFood;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
@@ -43,19 +44,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String foodName = getIntent().getStringExtra(ProductSelectionActivity.EXTRA_FOOD_NAME);
+        selectedFood = FoodDatabase.findByName(foodName);
+        if (selectedFood == null) {
+            Toast.makeText(this, "Product not selected, returning to list", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         initializeViews();
         setupCamera();
         setupButtons();
 
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        statusText.setText("Сначала нажмите 'Калибровка' и сфоткайте БЕЛЫЙ лист");
+        productNameText.setText(selectedFood.name);
+        changeProductText.setOnClickListener(v -> finish());
+
+        statusText.setText("First, tap 'Calibrate' and take a photo of a WHITE sheet");
     }
 
     private void initializeViews() {
         previewView = findViewById(R.id.previewView);
         pHValueText = findViewById(R.id.pHValueText);
         statusText = findViewById(R.id.statusText);
+        productNameText = findViewById(R.id.productNameText);
+        changeProductText = findViewById(R.id.changeProductText);
         captureButton = findViewById(R.id.captureButton);
         calibrateButton = findViewById(R.id.calibrateButton);
     }
@@ -101,18 +115,18 @@ public class MainActivity extends AppCompatActivity {
     private void setupButtons() {
         calibrateButton.setOnClickListener(v -> {
             isCalibrating = true;
-            statusText.setText("Сфоткайте БЕЛЫЙ лист бумаги для калибровки");
-            Toast.makeText(this, "Наведите камеру на БЕЛЫЙ лист и нажмите 'Сделать фото'", Toast.LENGTH_LONG).show();
+            statusText.setText("Take a photo of a WHITE sheet of paper for calibration");
+            Toast.makeText(this, "Point camera at a WHITE sheet and tap 'Take Photo'", Toast.LENGTH_LONG).show();
         });
 
         captureButton.setOnClickListener(v -> {
             if (imageCapture == null) {
-                Toast.makeText(this, "Камера не инициализирована", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera is not initialized", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!isCalibrating && !ColorAnalyzer.isCalibrated()) {
-                Toast.makeText(this, "Сначала выполните калибровку по белому листу!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please calibrate on a white sheet first!", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -140,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 bitmap.recycle();
                             } else {
-                                Toast.makeText(MainActivity.this, "Ошибка загрузки фото", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Failed to load photo", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -149,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(@NonNull ImageCaptureException exception) {
                         runOnUiThread(() ->
                                 Toast.makeText(MainActivity.this,
-                                        "Ошибка: " + exception.getMessage(),
+                                        "Error: " + exception.getMessage(),
                                         Toast.LENGTH_SHORT).show());
                     }
                 });
@@ -163,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
                 Math.max(0, centerX), Math.max(0, centerY), 200, 100);
 
         isCalibrating = false;
-        statusText.setText("✅ Калибровка выполнена! Теперь можно измерять pH");
-        pHValueText.setText("pH: готов");
-        Toast.makeText(this, "Калибровка успешна! Теперь фоткайте pH-полоски", Toast.LENGTH_LONG).show();
+        statusText.setText("✅ Calibration complete! Take a photo of the pH strip for \"" + selectedFood.name + "\"");
+        pHValueText.setText("pH: Ready");
+        Toast.makeText(this, "Calibration successful! Now photograph the pH strip", Toast.LENGTH_LONG).show();
     }
 
     private void analyzeImage(Bitmap bitmap) {
@@ -183,26 +197,39 @@ public class MainActivity extends AppCompatActivity {
 
         float pH = ColorAnalyzer.estimatePH(bitmap, centerX, centerY, width, height);
 
-        if (pH >= 0) {
-            String resultText = String.format(java.util.Locale.getDefault(),
-                    "pH: %.1f\nЦвет: %s", pH, hexColor);
-            pHValueText.setText(resultText);
+        if (pH < 0) {
+            pHValueText.setText("Error");
+            statusText.setText("⚠️ Please calibrate on a white sheet first");
+            return;
+        }
 
-            if (pH < 6) {
-                pHValueText.setTextColor(getColor(android.R.color.holo_red_dark));
-                statusText.setText("🔴 Кислая среда");
-            } else if (pH > 8) {
-                pHValueText.setTextColor(getColor(android.R.color.holo_blue_dark));
-                statusText.setText("🔵 Щелочная среда");
-            } else {
+        String resultText = String.format(java.util.Locale.getDefault(),
+                "pH: %.1f\nColor: %s", pH, hexColor);
+        pHValueText.setText(resultText);
+
+        FoodItem.Freshness freshness = selectedFood.classify(pH);
+
+        switch (freshness) {
+            case FRESH:
                 pHValueText.setTextColor(getColor(android.R.color.holo_green_dark));
-                statusText.setText("🟢 Нейтральная среда");
-            }
+                statusText.setText("🟢 Looks fresh: " + selectedFood.name);
+                break;
+            case SPOILED:
+                pHValueText.setTextColor(getColor(android.R.color.holo_red_dark));
+                statusText.setText("🔴 Looks spoiled: " + selectedFood.name);
+                break;
+            case UNCERTAIN:
+            default:
+                pHValueText.setTextColor(getColor(android.R.color.holo_orange_dark));
+                statusText.setText("⚠️ pH does not give a clear answer for: " + selectedFood.name);
+                break;
+        }
 
-            Toast.makeText(this, "Цвет объекта: " + hexColor + ", pH: " + pH, Toast.LENGTH_LONG).show();
+        if (selectedFood.pHUnreliable) {
+            Toast.makeText(this, selectedFood.reliabilityNote, Toast.LENGTH_LONG).show();
         } else {
-            pHValueText.setText("Ошибка");
-            statusText.setText("⚠️ Сначала выполните калибровку по белому листу");
+            Toast.makeText(this, "Object color: " + hexColor + ", pH: " +
+                    String.format(java.util.Locale.getDefault(), "%.1f", pH), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -221,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startCamera();
             } else {
-                Toast.makeText(this, "Разрешение на камеру необходимо", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show();
             }
         }
     }

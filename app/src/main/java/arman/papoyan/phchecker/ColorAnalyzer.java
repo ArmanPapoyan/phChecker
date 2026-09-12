@@ -42,16 +42,21 @@ public class ColorAnalyzer {
         return isCalibrated;
     }
 
+    /**
+     * Estimates pH from the strip color. Interpolates between the two closest
+     * reference colors on the chart instead of snapping to a whole pH step —
+     * several fresh/spoiled ranges in the food table are less than 1 pH unit
+     * apart, so whole-number resolution wasn't precise enough to tell them apart.
+     */
     public static float estimatePH(Bitmap bitmap, int x, int y, int width, int height) {
         if (!isCalibrated) {
             return -1;
         }
 
         float[] measuredColor = getAverageColor(bitmap, x, y, width, height);
-
         float[] correctedColor = correctColor(measuredColor);
 
-        return findClosestPH(correctedColor);
+        return interpolatePH(correctedColor);
     }
 
     private static float[] correctColor(float[] measuredColor) {
@@ -74,21 +79,39 @@ public class ColorAnalyzer {
         return corrected;
     }
 
-    private static float findClosestPH(float[] color) {
-        float minDistance = Float.MAX_VALUE;
-        float closestPH = 7.0f;
+    private static float interpolatePH(float[] color) {
+        PHColor best = null;
+        PHColor second = null;
+        float bestDist = Float.MAX_VALUE;
+        float secondDist = Float.MAX_VALUE;
 
         for (PHColor phColor : PH_COLORS) {
             float distance = calculateColorDistance(color, phColor.rgb);
             android.util.Log.d("ColorAnalyzer", "Distance to pH " + phColor.pH + ": " + distance);
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestPH = phColor.pH;
+            if (distance < bestDist) {
+                second = best;
+                secondDist = bestDist;
+                best = phColor;
+                bestDist = distance;
+            } else if (distance < secondDist) {
+                second = phColor;
+                secondDist = distance;
             }
         }
 
-        return closestPH;
+        if (best == null) {
+            return 7.0f;
+        }
+        if (second == null || (bestDist + secondDist) == 0f) {
+            return best.pH;
+        }
+
+        // Closer anchor color gets more weight (inverse-distance weighting between the 2 nearest anchors).
+        float weightBest = secondDist / (bestDist + secondDist);
+        float weightSecond = bestDist / (bestDist + secondDist);
+
+        return best.pH * weightBest + second.pH * weightSecond;
     }
 
     private static float calculateColorDistance(float[] color1, float[] color2) {
