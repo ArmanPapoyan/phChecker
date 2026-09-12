@@ -41,14 +41,11 @@ public class FoodDatabase {
                     "pH alone is unreliable here, rely also on smell, texture, and appearance.";
 
     static {
-        // Fish
         add("🐟 Fish (most species)", CAT_FISH, 6.6f, 6.8f, ranges(r(7f, 7.8f)), false, null);
 
-        // Bread
         add("🍞 White bread", CAT_BREAD, 5f, 6.2f, ranges(r(6.5f, 7.5f)), true, MOLD_NOTE);
         add("🍞 Whole grain bread", CAT_BREAD, 5.47f, 5.85f, ranges(r(6.5f, 7.5f)), true, MOLD_NOTE);
 
-        // Dairy Products
         add("🧀 Hard cheeses (Cheddar, Parmesan, Swiss)", CAT_DAIRY, 5.2f, 5.9f, ranges(above(7f), r(4f, 4.8f)), false, null);
         add("🧀 Soft cheeses (Ricotta, Cottage cheese)", CAT_DAIRY, 4.1f, 5.02f, ranges(above(6.5f)), false, null);
         add("🧈 Butter", CAT_DAIRY, 6.1f, 6.4f, ranges(r(4f, 5f), pt(7f)), false, null);
@@ -56,13 +53,11 @@ public class FoodDatabase {
         addPointFresh("🥛 Peptonized milk", CAT_DAIRY, 7.1f, ranges(r(7.5f, 8.5f)), false, null);
         addPointFresh("🥛 Condensed milk", CAT_DAIRY, 6.3f, ranges(r(4.2f, 5f), above(7f)), false, null);
 
-        // Meat
         add("🥩 Beef", CAT_MEAT, 5.1f, 6.2f, ranges(r(7f, 7.8f)), false, null);
         add("🍗 Chicken", CAT_MEAT, 6.2f, 6.4f, ranges(r(7f, 7.8f)), false, null);
         addPointFresh("🥓 Pork", CAT_MEAT, 5.7f, ranges(r(7f, 7.8f)), false, null);
         addPointFresh("🐟 White fish", CAT_MEAT, 5.5f, ranges(r(7f, 7.8f)), false, null);
 
-        // Vegetables
         add("🌱 Asparagus (shoots and stalks)", CAT_VEG, 5.7f, 6.1f, ranges(r(6.5f, 7.5f)), false, null);
         add("🫘 Beans (green and lima)", CAT_VEG, 4.6f, 6.5f, ranges(r(6.5f, 7.5f)), true, GENERIC_NOTE);
         add("🪴 Sugar beets", CAT_VEG, 4.2f, 4.4f, ranges(pt(3.5f), r(6.5f, 7.2f)), false, null);
@@ -88,7 +83,6 @@ public class FoodDatabase {
         add("🍅 Tomatoes (whole)", CAT_VEG, 4.2f, 4.3f, ranges(r(4f, 4.8f)), true, GENERIC_NOTE);
         add("🧅 Turnip", CAT_VEG, 5.2f, 5.5f, ranges(r(6.5f, 7.5f), r(4f, 5f)), false, null);
 
-        // Fruits
         add("🍎 Apples", CAT_FRUIT, 2.9f, 3.3f, ranges(above(3.8f)), true, GENERIC_NOTE);
         add("🍉 Watermelons", CAT_FRUIT, 5.2f, 5.6f, ranges(r(6f, 7.2f), r(4f, 4.8f)), false, null);
         add("🍑 Plums", CAT_FRUIT, 2.8f, 4.6f, ranges(r(2.8f, 3.8f)), true, GENERIC_NOTE);

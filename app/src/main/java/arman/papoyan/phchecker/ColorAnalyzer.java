@@ -42,12 +42,6 @@ public class ColorAnalyzer {
         return isCalibrated;
     }
 
-    /**
-     * Estimates pH from the strip color. Interpolates between the two closest
-     * reference colors on the chart instead of snapping to a whole pH step —
-     * several fresh/spoiled ranges in the food table are less than 1 pH unit
-     * apart, so whole-number resolution wasn't precise enough to tell them apart.
-     */
     public static float estimatePH(Bitmap bitmap, int x, int y, int width, int height) {
         if (!isCalibrated) {
             return -1;
@@ -107,7 +101,6 @@ public class ColorAnalyzer {
             return best.pH;
         }
 
-        // Closer anchor color gets more weight (inverse-distance weighting between the 2 nearest anchors).
         float weightBest = secondDist / (bestDist + secondDist);
         float weightSecond = bestDist / (bestDist + secondDist);
 

@@ -3,11 +3,6 @@ package arman.papoyan.phchecker;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * One row from the fresh-vs-spoiled pH reference table.
- * All numbers come directly from the reference data supplied by the user —
- * nothing here is invented or pulled from any other source.
- */
 public class FoodItem {
 
     public enum Freshness {
@@ -20,10 +15,9 @@ public class FoodItem {
     public final String category;
     public final float freshMin;
     public final float freshMax;
-    public final List<float[]> spoiledRanges; // each entry = {min, max}
-    public final boolean pHUnreliable;         // true when the source notes pH alone can't
-    // reliably tell fresh from spoiled for this food
-    public final String reliabilityNote;       // shown to the user when pHUnreliable == true
+    public final List<float[]> spoiledRanges;
+    public final boolean pHUnreliable;
+    public final String reliabilityNote;
 
     public FoodItem(String name, String category, float freshMin, float freshMax,
                     List<float[]> spoiledRanges, boolean pHUnreliable, String reliabilityNote) {
@@ -51,11 +45,6 @@ public class FoodItem {
         return false;
     }
 
-    /**
-     * Classifies a measured pH against THIS food's fresh/spoiled ranges only.
-     * UNCERTAIN covers: falls in both ranges (common for foods where the table
-     * itself shows overlapping ranges), or falls in neither.
-     */
     public Freshness classify(float pH) {
         boolean fresh = isFreshRange(pH);
         boolean spoiled = isSpoiledRange(pH);

@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#121212">
 
-    <!-- Camera Preview View -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
@@ -15,7 +14,6 @@
         app:layout_constraintDimensionRatio="H,4:3"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Top Overlay Badge (Product Selection) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topInfoPanel"
         android:layout_width="wrap_content"
@@ -55,7 +53,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Status Banner -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/statusCard"
         android:layout_width="0dp"
@@ -83,7 +80,6 @@
             android:textSize="14sp" />
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Bottom Control Panel -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/controlPanel"
         android:layout_width="match_parent"

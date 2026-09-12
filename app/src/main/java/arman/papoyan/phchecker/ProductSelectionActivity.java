@@ -19,11 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * First screen the user sees: pick a food from the fresh/spoiled pH reference
- * table. Only after a product is chosen does the camera / measurement screen
- * (MainActivity) open.
- */
 public class ProductSelectionActivity extends AppCompatActivity {
 
     public static final String EXTRA_FOOD_NAME = "arman.papoyan.phchecker.FOOD_NAME";
@@ -31,8 +26,8 @@ public class ProductSelectionActivity extends AppCompatActivity {
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    private final List<Object> allRows = new ArrayList<>();   // full list, grouped by category
-    private final List<Object> shownRows = new ArrayList<>(); // currently visible (filtered) rows
+    private final List<Object> allRows = new ArrayList<>();
+    private final List<Object> shownRows = new ArrayList<>();
     private RowAdapter adapter;
 
     @Override
@@ -72,7 +67,7 @@ public class ProductSelectionActivity extends AppCompatActivity {
         for (FoodItem item : FoodDatabase.ALL) {
             if (!item.category.equals(currentCategory)) {
                 currentCategory = item.category;
-                allRows.add(currentCategory); // header row
+                allRows.add(currentCategory);
             }
             allRows.add(item);
         }
@@ -84,7 +79,6 @@ public class ProductSelectionActivity extends AppCompatActivity {
         if (q.isEmpty()) {
             shownRows.addAll(allRows);
         } else {
-            // while searching, show a flat matching list without headers
             for (FoodItem item : FoodDatabase.ALL) {
                 if (item.name.toLowerCase(Locale.ROOT).contains(q)) {
                     shownRows.add(item);
