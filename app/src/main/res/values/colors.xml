@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base surfaces -->
+    <color name="bg_root">#0D0D0F</color>
+    <color name="surface_1">#1A1A1D</color>
+    <color name="surface_2">#212124</color>
+    <color name="surface_3">#28282C</color>
+    <color name="stroke_soft">#26FFFFFF</color>
+    <color name="stroke_soft_strong">#3DFFFFFF</color>
+    <color name="scrim_top">#99000000</color>
+    <color name="scrim_transparent">#00000000</color>
+
+    <!-- Brand / accent (amber-orange, matches flashlight & capture) -->
+    <color name="accent">#FF9F1C</color>
+    <color name="accent_dark">#C56A00</color>
+    <color name="accent_soft_bg">#332A1B0A</color>
+    <color name="accent_on">#1A1200</color>
+
+    <!-- Status semantics -->
+    <color name="ph_acidic">#EF5350</color>
+    <color name="ph_neutral">#FFCA28</color>
+    <color name="ph_alkaline">#66BB6A</color>
+    <color name="warning_bg">#33FFCA28</color>
+    <color name="warning_text">#FFD54F</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A6A6AD</color>
+    <color name="text_tertiary">#6E6E76</color>
+    <color name="text_on_accent">#1A1200</color>
+
+    <color name="ripple_light">#33FFFFFF</color>
+    <color name="ripple_accent">#40FFFFFF</color>
+
+</resources>

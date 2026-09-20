@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_root">
+
+    <!-- Камера -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+        app:layout_constraintDimensionRatio="H,4:3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <arman.papoyan.phchecker.CaptureOverlayView
+        android:id="@+id/captureOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@+id/previewView"
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintStart_toStartOf="@+id/previewView"
+        app:layout_constraintEnd_toEndOf="@+id/previewView" />
+
+    <!-- Мягкая градиентная подложка сверху для читаемости шапки -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="140dp"
+        android:background="@drawable/scrim_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Шапка: кнопка "назад к продукту" + название -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/topInfoPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:cardBackgroundColor="@color/surface_1"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/stroke_soft"
+        app:strokeWidth="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp">
+
+            <!-- Весь текст этой строки кликабельный (сюда навешан слушатель) -->
+            <TextView
+                android:id="@+id/changeProductText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:drawableStart="@drawable/ic_chevron_left"
+                android:drawablePadding="6dp"
+                android:drawableTint="@color/accent"
+                android:gravity="center_vertical"
+                android:paddingVertical="4dp"
+                android:paddingEnd="4dp"
+                android:text="Change product"
+                android:textColor="@color/accent"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/productNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:maxWidth="180dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Orange juice" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Статус / подсказка -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/statusCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginTop="14dp"
+        app:cardBackgroundColor="@color/surface_1"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:strokeColor="@color/warning_bg"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topInfoPanel">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_info" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calibrate on white paper first"
+                android:textColor="@color/warning_text"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Нижняя панель управления -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/controlPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/surface_1"
+        app:cardElevation="16dp"
+        app:cardCornerRadius="0dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.TopRounded"
+        app:strokeColor="@color/stroke_soft"
+        app:strokeWidth="1dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="22dp"
+            android:paddingBottom="28dp"
+            android:paddingHorizontal="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="pH LEVEL"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.14"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pHValueText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="—"
+                android:textColor="@color/ph_alkaline"
+                android:textSize="52sp"
+                android:fontFamily="sans-serif-black"
+                android:textStyle="bold" />
+
+            <!-- Ряд кнопок: вспышка / (место под FAB) / калибровка -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/flashButton"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="1"
+                    android:text="OFF"
+                    android:textColor="@color/accent"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:backgroundTint="@color/accent_soft_bg"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_flash"
+                    app:iconGravity="textStart"
+                    app:iconPadding="6dp"
+                    app:iconTint="@null"
+                    app:rippleColor="@color/ripple_accent"
+                    app:strokeColor="@color/stroke_soft"
+                    app:strokeWidth="1dp" />
+
+                <!-- Пустое место под плавающую кнопку съёмки -->
+                <Space
+                    android:layout_width="76dp"
+                    android:layout_height="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/calibrateButton"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:maxLines="1"
+                    android:text="Calibrate"
+                    android:textColor="@color/accent"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:backgroundTint="@color/accent_soft_bg"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_calibrate"
+                    app:iconGravity="textStart"
+                    app:iconPadding="6dp"
+                    app:iconTint="@null"
+                    app:rippleColor="@color/ripple_accent"
+                    app:strokeColor="@color/stroke_soft"
+                    app:strokeWidth="1dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Плавающая круглая кнопка съёмки: чуть выше панели, перекрытие минимальное -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/captureButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="8dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:contentDescription="Capture"
+        app:backgroundTint="@color/accent"
+        app:cornerRadius="36dp"
+        app:elevation="10dp"
+        app:icon="@drawable/ic_capture"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="28dp"
+        app:iconTint="@null"
+        app:rippleColor="@color/ripple_accent"
+        app:strokeColor="@color/bg_root"
+        app:strokeWidth="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
