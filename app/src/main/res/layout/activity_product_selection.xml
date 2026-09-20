@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/bg_root"
     android:orientation="vertical">
 
     <TextView
@@ -12,35 +12,62 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
         android:paddingTop="24dp"
-        android:paddingBottom="12dp"
-        android:text="Select Product"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
+        android:paddingBottom="4dp"
+        android:text="Select product"
+        android:textColor="@color/text_primary"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-black"
         android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="16dp"
+        android:text="Choose a reference to compare against your capture"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="#1E1E1E"
+        app:cardBackgroundColor="@color/surface_1"
         app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:strokeColor="#2C2C2C"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/stroke_soft"
         app:strokeWidth="1dp">
 
-        <EditText
-            android:id="@+id/searchBox"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@null"
-            android:hint="Search product..."
-            android:inputType="text"
-            android:paddingHorizontal="16dp"
-            android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#757575"
-            android:textSize="15sp" />
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_search" />
+
+            <EditText
+                android:id="@+id/searchBox"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Search product..."
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_tertiary"
+                android:textSize="15sp" />
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <ListView
@@ -48,9 +75,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:clipToPadding="false"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:paddingHorizontal="16dp"
+        android:paddingBottom="12dp"
         android:scrollbars="none" />
 
 </LinearLayout>

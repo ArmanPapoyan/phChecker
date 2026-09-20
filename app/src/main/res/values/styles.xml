@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Скругление только верхних углов — для нижней панели управления -->
+    <style name="ShapeAppearanceOverlay.App.TopRounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- Полностью круглая форма — для FAB-кнопки съёмки -->
+    <style name="ShapeAppearanceOverlay.App.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Пилюля — для маленьких вторичных кнопок и чипов -->
+    <style name="ShapeAppearanceOverlay.App.Pill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="TextAppearance.App.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>
