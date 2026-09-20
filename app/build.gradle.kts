@@ -41,7 +41,7 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
     implementation("androidx.camera:camera-view:$camerax_version")
-
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
     implementation("com.google.mlkit:image-labeling:17.0.7")
     implementation("com.github.QuadFlask:colorpicker:0.0.15")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")

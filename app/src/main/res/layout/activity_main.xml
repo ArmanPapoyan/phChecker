@@ -13,7 +13,14 @@
         app:layout_constraintBottom_toTopOf="@+id/controlPanel"
         app:layout_constraintDimensionRatio="H,4:3"
         app:layout_constraintTop_toTopOf="parent" />
-
+    <arman.papoyan.phchecker.CaptureOverlayView
+        android:id="@+id/captureOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@+id/previewView"
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintStart_toStartOf="@+id/previewView"
+        app:layout_constraintEnd_toEndOf="@+id/previewView" />
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/topInfoPanel"
         android:layout_width="wrap_content"

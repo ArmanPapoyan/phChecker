@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private PreviewView previewView;
     private TextView pHValueText, statusText, productNameText, changeProductText;
     private Button captureButton, calibrateButton;
-
+    private CaptureOverlayView captureOverlay;
     private ImageCapture imageCapture;
     private ExecutorService cameraExecutor;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         changeProductText = findViewById(R.id.changeProductText);
         captureButton = findViewById(R.id.captureButton);
         calibrateButton = findViewById(R.id.calibrateButton);
+        captureOverlay = findViewById(R.id.captureOverlay);
     }
 
     private void setupCamera() {
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         runOnUiThread(() -> {
-                            Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                            Bitmap bitmap = loadBitmapWithRotation(photoFile);
                             if (bitmap != null) {
                                 if (isCalibrating) {
                                     calibrateWithWhite(bitmap);
@@ -170,11 +171,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void calibrateWithWhite(Bitmap bitmap) {
-        int centerX = bitmap.getWidth() / 2 - 100;
-        int centerY = bitmap.getHeight() / 2 - 50;
+        int centerX = bitmap.getWidth() / 2 - 150;
+        int centerY = bitmap.getHeight() / 2 - 75;
 
-        ColorAnalyzer.calibrateWithWhite(bitmap,
-                Math.max(0, centerX), Math.max(0, centerY), 200, 100);
+        if (centerX < 0) centerX = 0;
+        if (centerY < 0) centerY = 0;
+
+        int width = Math.min(300, bitmap.getWidth() - centerX);
+        int height = Math.min(150, bitmap.getHeight() - centerY);
+
+        Bitmap roiBitmap = Bitmap.createBitmap(bitmap, centerX, centerY, width, height);
+        Bitmap blurredRoi = Bitmap.createScaledBitmap(
+                roiBitmap,
+                Math.max(1, width / 8),
+                Math.max(1, height / 8),
+                true);
+
+        ColorAnalyzer.calibrateWithWhiteFromBitmap(blurredRoi);
+
+        roiBitmap.recycle();
+        blurredRoi.recycle();
 
         isCalibrating = false;
         statusText.setText("✅ Calibration complete! Take a photo of the pH strip for \"" + selectedFood.name + "\"");
@@ -183,19 +199,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void analyzeImage(Bitmap bitmap) {
-        int centerX = bitmap.getWidth() / 2 - 100;
-        int centerY = bitmap.getHeight() / 2 - 50;
+        android.util.Log.d("Camera", "Bitmap size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+
+        int centerX = bitmap.getWidth() / 2 - 150;
+        int centerY = bitmap.getHeight() / 2 - 75;
 
         if (centerX < 0) centerX = 0;
         if (centerY < 0) centerY = 0;
 
-        int width = Math.min(200, bitmap.getWidth() - centerX);
-        int height = Math.min(100, bitmap.getHeight() - centerY);
+        int width = Math.min(300, bitmap.getWidth() - centerX);
+        int height = Math.min(150, bitmap.getHeight() - centerY);
 
-        float[] objectColor = ColorAnalyzer.getAverageColor(bitmap, centerX, centerY, width, height);
+        // 1) Вырезаем ROI
+        Bitmap roiBitmap = Bitmap.createBitmap(bitmap, centerX, centerY, width, height);
+
+        // 2) Размываем через уменьшение
+        Bitmap blurredRoi = Bitmap.createScaledBitmap(
+                roiBitmap,
+                Math.max(1, width / 8),
+                Math.max(1, height / 8),
+                true);
+
+        // 3) СНАЧАЛА считаем цвет и pH
+        float[] objectColor = ColorAnalyzer.getAverageColorFromBitmap(blurredRoi);
         String hexColor = ColorAnalyzer.getHexColor(objectColor);
+        float pH = ColorAnalyzer.estimatePHFromBitmap(blurredRoi);
 
-        float pH = ColorAnalyzer.estimatePH(bitmap, centerX, centerY, width, height);
+        // 4) ТОЛЬКО ТЕПЕРЬ освобождаем
+        roiBitmap.recycle();
+        blurredRoi.recycle();
+
+        android.util.Log.d("Camera", "ROI color: " + hexColor + ", pH: " + pH);
 
         if (pH < 0) {
             pHValueText.setText("Error");
@@ -231,8 +265,44 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Object color: " + hexColor + ", pH: " +
                     String.format(java.util.Locale.getDefault(), "%.1f", pH), Toast.LENGTH_LONG).show();
         }
-    }
+    }    private Bitmap loadBitmapWithRotation(File file) {
+        Bitmap bmp = BitmapFactory.decodeFile(file.getAbsolutePath());
+        if (bmp == null) return null;
 
+        try {
+            androidx.exifinterface.media.ExifInterface exif =
+                    new androidx.exifinterface.media.ExifInterface(file.getAbsolutePath());
+            int orientation = exif.getAttributeInt(
+                    androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL);
+
+            android.graphics.Matrix matrix = new android.graphics.Matrix();
+            switch (orientation) {
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90:
+                    matrix.postRotate(90);
+                    break;
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180:
+                    matrix.postRotate(180);
+                    break;
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270:
+                    matrix.postRotate(270);
+                    break;
+                default:
+                    return bmp;
+            }
+
+            Bitmap rotated = Bitmap.createBitmap(bmp, 0, 0,
+                    bmp.getWidth(), bmp.getHeight(), matrix, true);
+            if (rotated != bmp) {
+                bmp.recycle();
+            }
+            return rotated;
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            return bmp;
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
