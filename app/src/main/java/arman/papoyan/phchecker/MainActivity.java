@@ -38,7 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private FoodItem selectedFood;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-
+    private androidx.camera.core.Camera camera;
+    private Button flashButton;
+    private boolean isTorchOn = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
         changeProductText = findViewById(R.id.changeProductText);
         captureButton = findViewById(R.id.captureButton);
         calibrateButton = findViewById(R.id.calibrateButton);
+        flashButton = findViewById(R.id.flashButton);
         captureOverlay = findViewById(R.id.captureOverlay);
+
     }
 
     private void setupCamera() {
@@ -110,10 +114,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
-        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+        camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
     }
 
     private void setupButtons() {
+        flashButton.setOnClickListener(v -> toggleTorch());
         calibrateButton.setOnClickListener(v -> {
             isCalibrating = true;
             statusText.setText("Take a photo of a WHITE sheet of paper for calibration");
@@ -134,7 +139,29 @@ public class MainActivity extends AppCompatActivity {
             takePhoto();
         });
     }
+    private void toggleTorch() {
+        if (camera == null) {
+            Toast.makeText(this, "Camera not ready", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!camera.getCameraInfo().hasFlashUnit()) {
+            Toast.makeText(this, "Flash not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        isTorchOn = !isTorchOn;
+        camera.getCameraControl().enableTorch(isTorchOn);
+
+        flashButton.setText(isTorchOn ? "🔦 ON" : "🔦 OFF");
+
+        ColorAnalyzer.resetCalibration();
+        statusText.setText("Light changed. Please recalibrate on a WHITE sheet.");
+        pHValueText.setText("pH: --");
+        Toast.makeText(this,
+                isTorchOn ? "Flash ON. Recalibrate on white sheet."
+                        : "Flash OFF. Recalibrate on white sheet.",
+                Toast.LENGTH_LONG).show();
+    }
     private void takePhoto() {
         File photoFile = new File(getExternalFilesDir(null), "temp_photo.jpg");
 

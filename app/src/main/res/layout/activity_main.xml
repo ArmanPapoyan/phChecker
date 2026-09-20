@@ -117,18 +117,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/flashButton"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="🔦 OFF"
+                    android:textColor="#FFA726"
+                    android:textSize="13sp"
+                    app:backgroundTint="#2C2419"
+                    app:cornerRadius="16dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/calibrateButton"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
                     android:layout_height="54dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:text="Calibrate (White)"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Calibrate"
                     android:textColor="#FFA726"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     app:backgroundTint="#2C2419"
                     app:cornerRadius="16dp" />
 
@@ -136,10 +155,12 @@
                     android:id="@+id/captureButton"
                     android:layout_width="0dp"
                     android:layout_height="54dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_weight="1"
-                    android:text="Take Photo"
-                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Capture"
+                    android:textSize="13sp"
                     app:backgroundTint="#FF9800"
                     app:cornerRadius="16dp" />
             </LinearLayout>

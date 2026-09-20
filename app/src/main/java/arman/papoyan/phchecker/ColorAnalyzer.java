@@ -18,7 +18,7 @@ public class ColorAnalyzer {
         PH_COLORS.add(new PHColor(6, "#b698d0"));
         PH_COLORS.add(new PHColor(7, "#5a719d"));
         PH_COLORS.add(new PHColor(8, "#4187a9"));
-        PH_COLORS.add(new PHColor(9, "#206f36"));
+        PH_COLORS.add(new PHColor(9,  "#206f36"));
         PH_COLORS.add(new PHColor(10, "#58ad50"));
         PH_COLORS.add(new PHColor(11, "#82ba4a"));
         PH_COLORS.add(new PHColor(12, "#8dc357"));
@@ -47,7 +47,11 @@ public class ColorAnalyzer {
     public static boolean isCalibrated() {
         return isCalibrated;
     }
-
+    public static void resetCalibration() {
+        whiteReference = new float[]{255f, 255f, 255f};
+        isCalibrated = false;
+        android.util.Log.d("ColorAnalyzer", "Calibration reset");
+    }
     public static float estimatePH(Bitmap bitmap, int x, int y, int width, int height) {
         if (!isCalibrated) {
             return -1;
@@ -66,7 +70,6 @@ public class ColorAnalyzer {
     }
     private static float[] correctColor(float[] measuredColor) {
         float refAvg = (whiteReference[0] + whiteReference[1] + whiteReference[2]) / 3f;
-
         float scale = 255f / refAvg;
         scale = Math.min(scale, 1.5f);
 
@@ -77,6 +80,20 @@ public class ColorAnalyzer {
         r = Math.max(0, Math.min(255, r));
         g = Math.max(0, Math.min(255, g));
         b = Math.max(0, Math.min(255, b));
+
+        float[] hsv = new float[3];
+        android.graphics.Color.RGBToHSV(Math.round(r), Math.round(g), Math.round(b), hsv);
+
+        hsv[1] = Math.min(1f, hsv[1] * 1.7f);
+
+        if (hsv[2] < 0.6f) {
+            hsv[2] = Math.min(1f, hsv[2] * 1.15f);
+        }
+
+        int out = android.graphics.Color.HSVToColor(hsv);
+        r = android.graphics.Color.red(out);
+        g = android.graphics.Color.green(out);
+        b = android.graphics.Color.blue(out);
 
         android.util.Log.d("ColorAnalyzer", "Corrected: R=" + r + " G=" + g + " B=" + b);
         return new float[]{r, g, b};
@@ -128,12 +145,12 @@ public class ColorAnalyzer {
         if (dh > 180f) dh = 360f - dh;
         dh /= 180f;
 
-        float ds = Math.abs(hsv1[1] - hsv2[1]);  // 0..1
-        float dv = Math.abs(hsv1[2] - hsv2[2]);  // 0..1
+        float ds = Math.abs(hsv1[1] - hsv2[1]);
+        float dv = Math.abs(hsv1[2] - hsv2[2]);
 
-        float weightH = 0.7f;
-        float weightS = 0.2f;
-        float weightV = 0.1f;
+        float weightH = 0.6f;
+        float weightS = 0.25f;
+        float weightV = 0.15f;
 
         return (float) Math.sqrt(
                 weightH * dh * dh +
@@ -141,7 +158,6 @@ public class ColorAnalyzer {
                         weightV * dv * dv
         ) * 255f;
     }
-
     public static float[] getAverageColor(Bitmap bitmap, int x, int y, int width, int height) {
         int startX = Math.max(0, x);
         int startY = Math.max(0, y);
@@ -151,7 +167,7 @@ public class ColorAnalyzer {
         int totalPixels = (endX - startX) * (endY - startY);
         if (totalPixels <= 0) return new float[]{0, 0, 0};
 
-        final int QLEVELS = 8; // 8x8x8 = 512 корзин
+        final int QLEVELS = 8;
         final int BIN_COUNT = QLEVELS * QLEVELS * QLEVELS;
 
         long[] sumR = new long[BIN_COUNT];
@@ -174,7 +190,7 @@ public class ColorAnalyzer {
                 sumR[binIdx] += r;
                 sumG[binIdx] += g;
                 sumB[binIdx] += b;
-                count[binIdx]++;   // ← теперь точно есть
+                count[binIdx]++;
             }
         }
 
